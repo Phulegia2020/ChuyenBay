@@ -17,7 +17,8 @@ char tdMayBay[soItem_MenuMB][100] = { "1. Them may bay",
 char tdChuyenBay[soItem_MenuCB][100] = { "1. Them chuyen bay",
 										 "2. Xoa chuyen bay",
 										 "3. Hieu chinh chuyen bay",
-										 "4. Tro ve"
+										 "4. Huy chuyen bay",
+										 "5. Tro ve"
 };
 
 int main() {

@@ -135,6 +135,8 @@ char* gdTimMa(LIST_MB lstMB, int type, string title) {
 int hieuChinh_MB(LIST_MB& lstMB, int i) {
 	khungNhapThongTin(SUA_MB, "HIEU CHINH MAY BAY", "So hieu may bay:", "Sua loai may bay:", "Sua so day:", "Sua so dong:");
 	
+	mayBay m = lstMB.nodeMB[i]->data;
+	
 	if (i == -1)
 		return 0;
 	gotoxy(COT + 1, DONGNHAP1 + 2);
@@ -167,6 +169,10 @@ int hieuChinh_MB(LIST_MB& lstMB, int i) {
 			if (lstMB.nodeMB[i]->data.soDay > MAX_DAY || lstMB.nodeMB[i]->data.soDay < 0) {
 				hienThongBao("So day phai < 9 va > 0");
 			}
+			else if (lstMB.nodeMB[i]->data.soDay < m.soDay)
+			{
+				hienThongBao("So day phai lon hon hoac bang ban dau!");
+			}
 			else break;
 		}
 
@@ -185,10 +191,13 @@ int hieuChinh_MB(LIST_MB& lstMB, int i) {
 			if (lstMB.nodeMB[i]->data.soDong > MAX_DONG || lstMB.nodeMB[i]->data.soDong < 0) {
 				hienThongBao("So day phai < 20 va > 0");
 			}
+			else if (lstMB.nodeMB[i]->data.soDong < m.soDong)
+			{
+				hienThongBao("So dong phai lon hon hoac bang ban dau!");
+			}
 			else break;
 		}
 	} while (true);
-
 	
 	return 1;
 }
@@ -367,6 +376,9 @@ CHUYENBAY createCB(PTRChuyenBay lstCB, CHUYENBAY cb, LIST_MB lstMB) {
 		
 	} while (true);
 	
+	xoaKhungDS();
+	showCB(lstCB);
+	
 	do
 	{
 		cb.sanBayDen[0] = { '\0' };
@@ -522,11 +534,6 @@ int hieuChinhCB(PTRChuyenBay& lstCB, PTRChuyenBay p, LIST_MB lstMB)
 	{
 		return 0;
 	}
-	/*else
-	{
-		p->data = createCB(lstCB, p->data, lstMB);
-		return 1;
-	}*/
 	
 	gotoxy(COT + 1, DONGNHAP1 + 2);
 	rewind(stdin);
@@ -560,6 +567,9 @@ int hieuChinhCB(PTRChuyenBay& lstCB, PTRChuyenBay p, LIST_MB lstMB)
 		}
 		
 	} while (true);
+	
+	xoaKhungDS();
+	showCB(lstCB);
 	
 	do
 	{
@@ -625,6 +635,11 @@ int hieuChinhCB(PTRChuyenBay& lstCB, PTRChuyenBay p, LIST_MB lstMB)
 	while (true);
 	
 	return 1;
+}
+
+void huyCB(PTRChuyenBay& lstCB)
+{
+	
 }
 
 //========== doc xuat file ===============
@@ -891,30 +906,12 @@ int rangBuocThoiGian(THOI_GIAN tg)
 {
 	time_t baygio = time(0);
 	tm *ltm = localtime(&baygio);
-	/*int posx = X_VT + 95,
-		posy = Y_VT + 10;*/
 	if(tg.ngay < ltm->tm_mday || tg.thang < 1 + ltm->tm_mon || tg.nam < 1900 + ltm->tm_year)
 	{
 		if(tg.thang <= 1 + ltm->tm_mon || tg.nam < 1900 + ltm->tm_year)
 		{
 			if(tg.nam <= 1900 + ltm->tm_year)
 			{
-				//TextColor(MAUNEN);
-				//gotoxy(posx + 2, posy + 28);
-				//cout << "HIEN TAI LA NGAY " << ltm->tm_mday << "/" << 1 + ltm->tm_mon << "/" << 1900 + ltm->tm_year << "! VUI LONG NHAP NGAY THANG HOP LE!";
-//				char nam[4];
-//				itoa(1900 + ltm->tm_year, nam, 10);
-//				char thang[2];
-//				itoa(ltm->tm_mday, thang, 10);
-//				char ngay[2];
-//				itoa(ltm->tm_mday, ngay, 10);
-//				strcat(ngay, "/");
-//				strcat(ngay, thang);
-//				strcat(ngay, "/");
-//				strcat(ngay, nam);
-//				strcat(ngay, " la hom nay.Lap chuyen bay sau ngay hien tai!");
-//				hienThongBao(ngay);
-				
 				char nam[4];
 				itoa(1900 + ltm->tm_year, nam, 10);
 				char thang[2];
@@ -929,110 +926,63 @@ int rangBuocThoiGian(THOI_GIAN tg)
 				strcat(ngay, ". Lap chuyen bay sau ngay hien tai!");
 				strcat(thongbao, ngay);
 				hienThongBao(thongbao);
-				//Sleep(1000);
-				//TextColor(MAU_CONSOLE);
-				//gotoxy(posx + 2, posy + 28);
-				//cout << "                                                                           ";
 				return 1;
 			}
 		}
 	}
-	if (tg.ngay == 31 && (tg.thang == 4 || tg.thang == 6 || tg.thang == 9 || tg.thang == 11))
+	
+	if (tg.ngay >= 31 && (tg.thang == 4 || tg.thang == 6 || tg.thang == 9 || tg.thang == 11))
 	{
-		//TextColor(MAUNEN);
-		//gotoxy(posx + 2, posy + 28);
-		//cout << "THANG " << tg.thang << " CHI CO 30 NGAY!";
-//		char month[2];
-//		itoa(tg.thang, month, 10);
-//		strcat(month, " chi co 30 ngay!");
-//		hienThongBao(month);
-		
 		char month[2];
 		itoa(tg.thang, month, 10);
 		char thongbao[7] = "Thang ";
 		strcat(month, " chi co 30 ngay!");
 		strcat(thongbao, month);
 		hienThongBao(thongbao);
-		//Sleep(1000);
-		//TextColor(MAU_CONSOLE);
-		//gotoxy(posx + 2, posy + 28);
-		//cout << "                                             ";
 		return 1;
 	}
-	if((tg.ngay == 30 || tg.ngay == 31) && tg.thang == 2)
+	if(tg.ngay > 29 && tg.thang == 2)
 	{
-		//TextColor(MAUNEN);
-		//gotoxy(posx + 2, posy + 28);
-		//cout << "THANG " << tg.thang << " CHI CO 29 NGAY!";
-//		char month[2];
-//		itoa(tg.thang, month, 10);
-//		strcat(month, " chi co 29 ngay!");
-//		hienThongBao(month);
-		
 		char month[2];
 		itoa(tg.thang, month, 10);
 		char thongbao[7] = "Thang ";
 		strcat(month, " chi co 29 ngay!");
 		strcat(thongbao, month);
 		hienThongBao(thongbao);
-		//Sleep(1000);
-		//TextColor(MAU_CONSOLE);
-		//gotoxy(posx + 2, posy + 28);
-		//cout << "                                             ";
 		return 1;
 	}
 	if(!((tg.nam % 4 == 0 && tg.nam % 100 != 0) || tg.nam % 400 == 0) && tg.ngay == 29 && tg.thang == 2) // kiem tra nam nhuan
-	{
-		//TextColor(MAUNEN);
-		//gotoxy(posx + 2, posy + 28);
-		//cout << "NAM " << tg.nam << " LA NAM KHONG NHUAN NEN THANG 2 CHI CO 28 NGAY! NHAP LAI!";		
+	{		
 		char year[4];
 		itoa(tg.nam, year, 10);
-		strcat(year, " la nam khong nhuan nen thang 2 chi co 28 ngay!");
-		hienThongBao(year);
-		//Sleep(1000);
-		//TextColor(MAU_CONSOLE);
-		//gotoxy(posx + 2, posy + 28);
-		//cout << "                                                                                   ";			
+		strcat(year, " la nam khong nhuan nen thang 2 chi co 28 ngay!");			
 		return 1;
 	}
-	/*if(tg.nam <= 1999)
+	if (tg.ngay > 31)
 	{
-		//TextColor(MAUNEN);
-		//gotoxy(posx + 2, posy + 28);
-		//cout << "VUI LONG NHAP NAM TU 1999 TRO LEN!";		
-		hienThongBao("VUI LONG NHAP NAM TU 1999 TRO LEN!");
-		//Sleep(1000);
-		//TextColor(MAU_CONSOLE);
-		//gotoxy(posx + 2, posy + 28);
-		//cout << "                                  ";			
+		char month[2];
+		itoa(tg.thang, month, 10);
+		char thongbao[7] = "Thang ";
+		strcat(month, " chi co 31 ngay!");
+		strcat(thongbao, month);
+		hienThongBao(thongbao);
 		return 1;
-	}*/
+	}
 	return -1;
 }
 
 int rangBuocGio(THOI_GIAN h)
 {
-	/*time_t baygio = time(0);
-	tm *ltm = localtime(&baygio);*/
-	
 	if (h.gio > 23 || h.gio < 0)
 	{
-		//cout << "GIO BAT DAU TU 0H DEN 23H! VUI LONG NHAP GIO HOP LE!";
 		hienThongBao("Gio bat dau tu 0h den 23h. Vui long nhap gio hop le!");
 		return 1;
 	}
 	if (h.phut > 59 || h.phut < 0)
 	{
-		//cout << "GIO BAT DAU TU 0 DEN 59 PHUT! VUI LONG NHAP PHUT HOP LE!";
 		hienThongBao("Phut bat dau tu 0 den 59 phut. Vui long nhap phut hop le!");
 		return 1;
 	}
-	/*if (h.gio > ltm->tm_hour)
-	{
-		cout << "HIEN TAI LA " << ltm->tm_hour << ":" << 1 + ltm->tm_min << "! VUI LONG NHAP GIO PHUT HOP LE!";
-		return TRUE;
-	}*/
 	return -1;
 }
 
@@ -1295,6 +1245,8 @@ int menuDong_MayBay(char td[soItem_MenuMB][100]) {
 			break;
 		case ENTER:
 			return chon + 1;
+//		case ESC:
+//			return 0;
 		}
 	} while (TRUE);
 }

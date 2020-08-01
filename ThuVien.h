@@ -117,6 +117,7 @@ void showCB(PTRChuyenBay lstCB);
 int rangBuocThoiGian(THOI_GIAN tg);
 int rangBuocGio(THOI_GIAN h);
 int hieuChinhCB(PTRChuyenBay& lstCB, PTRChuyenBay p, LIST_MB lstMB);
+void huyCB(PTRChuyenBay& lstCB);
 
 // cau truc hanh khach
 struct HanhKhach {
@@ -151,7 +152,7 @@ void Nhap_SO(int &var, int len);
 //============= Xu ly Giao dien ==============//
 const int soItem_MenuChinh = 7;
 const int soItem_MenuMB = 4;
-const int soItem_MenuCB = 4;
+const int soItem_MenuCB = 5;
 const int soItem_MenuDV = 3;
 
 char* gdTimMa(LIST_MB lstMB, int type, string title);
